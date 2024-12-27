@@ -145,6 +145,7 @@ class Control:
         signal: str = ...,
         **kwargs: Any
     ) -> list[dict[str, _Reply]] | None: ...
+    def revoke_by_stamped_headers(*args, **kwargs: Any) -> None: ...
     def terminate(
         self,
         task_id: str,

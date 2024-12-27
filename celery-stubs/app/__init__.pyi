@@ -12,6 +12,7 @@ from celery.app import control as control
 from celery.app import events as events
 from celery.app import task as task
 from celery.app.task import Context
+from celery.app.task import Task as CeleryTask
 from celery.app.task import Task as Task
 from celery.utils.threads import _LocalStack
 from typing_extensions import Concatenate, ParamSpec
@@ -37,6 +38,10 @@ def shared_task(
     soft_time_limit: int = ...,
     time_limit: int = ...,
     base: None = ...,
+    pydantic: bool = ...,
+    pydantic_dump_kwargs: dict[str, Any] = ...,
+    on_failure: Any = ...,
+    before_start: Any = ...,
     retry_kwargs: dict[str, Any] = ...,
     retry_backoff: bool | int = ...,
     retry_backoff_max: int = ...,
@@ -57,7 +62,7 @@ def shared_task(
     request_stack: _LocalStack[Context] = ...,
     abstract: bool = ...,
     queue: str = ...,
-) -> Callable[[Callable[_P, _R]], Task[_P, _R]]: ...
+) -> Callable[[Callable[_P, _R]], CeleryTask[_P, _R]]: ...
 @overload
 def shared_task(
     *,
@@ -83,6 +88,11 @@ def shared_task(
     send_events: bool = ...,
     store_errors_even_if_ignored: bool = ...,
     autoregister: bool = ...,
+    pydantic: bool = ...,
+    pydantic_strict: bool = ...,
+    pydantic_dump_kwargs: dict[str, Any] = ...,
+    on_failure: Any = ...,
+    before_start: Any = ...,
     track_started: bool = ...,
     acks_on_failure_or_timeout: bool = ...,
     reject_on_worker_lost: bool = ...,
@@ -93,7 +103,7 @@ def shared_task(
     request_stack: _LocalStack[Context] = ...,
     abstract: bool = ...,
     queue: str = ...,
-) -> Callable[[Callable[Concatenate[Task[_P, _R], _P], _R]], Task[_P, _R]]: ...
+) -> Callable[[Callable[Concatenate[CeleryTask[_P, _R], _P], _R]], CeleryTask[_P, _R]]: ...
 @overload
 def shared_task(
     *,
@@ -109,6 +119,10 @@ def shared_task(
     soft_time_limit: int = ...,
     time_limit: int = ...,
     base: type[_T],
+    pydantic: bool = ...,
+    pydantic_dump_kwargs: dict[str, Any] = ...,
+    on_failure: Any = ...,
+    before_start: Any = ...,
     retry_kwargs: dict[str, Any] = ...,
     retry_backoff: bool | int = ...,
     retry_backoff_max: int = ...,

@@ -18,10 +18,6 @@ _F = TypeVar("_F", bound=Callable[..., Any])
 _R = TypeVar("_R", covariant=True)
 
 class Signature(dict[str, Any], Generic[_R]):
-    @classmethod
-    def from_dict(
-        cls, d: dict[str, Any], app: Celery | None = ...
-    ) -> Signature[Any]: ...
     def __init__(
         self,
         task: Task[Any, _R] | str | None = ...,
@@ -56,9 +52,7 @@ class Signature(dict[str, Any], Generic[_R]):
         headers: dict[str, str] = ...,
     ) -> None: ...
     def __call__(self, *partial_args: Any, **partial_kwargs: Any) -> _R: ...
-    def delay(
-        self, *partial_args: Any, **partial_kwargs: Any
-    ) -> celery.result.AsyncResult[_R]: ...
+    def delay(self, *partial_args: Any, **partial_kwargs: Any) -> celery.result.AsyncResult[_R]: ...
     def apply(
         self,
         args: tuple[Any, ...] | None = ...,
@@ -177,6 +171,8 @@ class Signature(dict[str, Any], Generic[_R]):
     def type(self) -> Any: ...
     @property
     def app(self) -> Celery: ...
+    @classmethod
+    def from_dict(cls, d: dict[str, Any], app: Celery | None = ...) -> Signature[Any]: ...
     def AsyncResult(self) -> celery.result.AsyncResult[_R]: ...
     id: str | None
     parent_id: str | None
@@ -192,7 +188,7 @@ class Signature(dict[str, Any], Generic[_R]):
 class _chain(Signature[Any]):
     def __init__(
         self,
-        *tasks: Signature[Any],
+        *tasks: Signature[Any] | Iterable[Signature[Any]],
         # Signature extras
         options: dict[str, Any] | None = ...,
         type: Any | None = ...,
@@ -334,9 +330,7 @@ class group(Signature[Any]):
         publisher: kombu.Producer = ...,
         headers: dict[str, str] = ...,
     ) -> None: ...
-    def skew(
-        self, start: float = ..., stop: float | None = ..., step: float = ...
-    ) -> group: ...
+    def skew(self, start: float = ..., stop: float | None = ..., step: float = ...) -> group: ...
     def __or__(self, other: Signature[Any]) -> chord: ...  # type: ignore[override]
 
 _group = group
@@ -382,6 +376,9 @@ class chord(Signature[Any]):
         body: Signature[Any] | None = ...,
         **options: Any,
     ) -> celery.result.AsyncResult[Any]: ...
+    def stamp(
+        self, visitor: StampingVisitor = ..., append_stamps: bool = ..., **headers: Any
+    ) -> Signature[Any]: ...
 
 def signature(
     varies: Signature[Any] | str | dict[str, Any], *args: Any, **kwargs: Any
@@ -396,3 +393,5 @@ def maybe_signature(
 ) -> abstract.CallableSignature | None: ...
 
 maybe_subtask = maybe_signature
+
+class StampingVisitor: ...
