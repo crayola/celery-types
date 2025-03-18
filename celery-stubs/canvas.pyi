@@ -215,6 +215,9 @@ class _chain(Signature[Any]):
         publisher: kombu.Producer = ...,
         headers: dict[str, str] = ...,
     ) -> None: ...
+    def stamp(
+        self, visitor: StampingVisitor = ..., append_stamps: bool = ..., **headers: Any
+    ) -> Signature[Any]: ...
 
 class chain(_chain): ...
 
@@ -332,6 +335,9 @@ class group(Signature[Any]):
     ) -> None: ...
     def skew(self, start: float = ..., stop: float | None = ..., step: float = ...) -> group: ...
     def __or__(self, other: Signature[Any]) -> chord: ...  # type: ignore[override]
+    def stamp(
+        self, visitor: StampingVisitor = ..., append_stamps: bool = ..., **headers: Any
+    ) -> Signature[Any]: ...
 
 _group = group
 
